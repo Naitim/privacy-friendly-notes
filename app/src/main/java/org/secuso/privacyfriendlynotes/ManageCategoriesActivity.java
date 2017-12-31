@@ -33,7 +33,7 @@ public class ManageCategoriesActivity extends AppCompatActivity implements View.
         findViewById(R.id.btn_add).setOnClickListener(this);
         list = (ListView) findViewById(R.id.category_list);
         String[] from = {DbContract.CategoryEntry.COLUMN_NAME};
-        int[] to = {R.id.item_name};
+        int[] to = {R.id.note_title};
         list.setAdapter(new SimpleCursorAdapter(getBaseContext(), R.layout.item_category, DbAccess.getCategoriesWithoutDefault(getBaseContext()), from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER));
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {

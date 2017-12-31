@@ -3,6 +3,7 @@ package org.secuso.privacyfriendlynotes;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 
 /**
  * Created by Robin on 11.06.2016.
@@ -20,7 +21,9 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                     DbContract.NoteEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                     DbContract.NoteEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
                     DbContract.NoteEntry.COLUMN_CATEGORY + " INTEGER, " +
-                    DbContract.NoteEntry.COLUMN_TRASH + " INTEGER NOT NULL DEFAULT 0);";
+                    DbContract.NoteEntry.COLUMN_TRASH + " INTEGER NOT NULL DEFAULT 0, " +
+                    DbContract.NoteEntry.COLUMN_COLOR + " INTEGER NOT NULL DEFAULT -1, " +
+                    DbContract.NoteEntry.COLUMN_POSITION + "INTEGER NOT NULL DEFAULT 0);";
 
     private static final String CATEGORIES_TABLE_CREATE =
             "CREATE TABLE " + DbContract.CategoryEntry.TABLE_NAME + " (" +

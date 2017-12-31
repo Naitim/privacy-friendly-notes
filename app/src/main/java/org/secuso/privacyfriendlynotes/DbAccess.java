@@ -26,7 +26,7 @@ public class DbAccess {
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = { NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_CATEGORY };
+        String[] projection = { NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_CATEGORY, NoteEntry.COLUMN_COLOR};
         String selection = NoteEntry.COLUMN_ID + " = ?";
         String[] selectionArgs = {"" + id};
 
@@ -55,6 +55,7 @@ public class DbAccess {
         values.put(NoteEntry.COLUMN_CONTENT, content);
         values.put(NoteEntry.COLUMN_CATEGORY, category);
         int id = (int)(long)db.insert(NoteEntry.TABLE_NAME, null, values);
+
         db.close();
         return id;
     }
@@ -76,11 +77,12 @@ public class DbAccess {
         values.put(NoteEntry.COLUMN_CATEGORY, category);
 
         String selection = NoteEntry.COLUMN_ID + " = ?";
-        String[] selectionArgs = { String.valueOf(id) };
+        String[] selectionArgs = {String.valueOf(id)};
 
         db.update(NoteEntry.TABLE_NAME, values, selection, selectionArgs);
         db.close();
     }
+
 
     /**
      * Moves a note to trash
@@ -168,7 +170,7 @@ public class DbAccess {
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT};
+        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_COLOR};
 
         return db.query(NoteEntry.TABLE_NAME,   // Table name
                 projection,                     // SELECT
@@ -190,7 +192,7 @@ public class DbAccess {
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT};
+        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_COLOR};
 
         return db.query(NoteEntry.TABLE_NAME,   // Table name
                 projection,                     // SELECT
@@ -210,7 +212,7 @@ public class DbAccess {
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT};
+        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_COLOR};
 
         String sortOrder = NoteEntry.COLUMN_NAME + " COLLATE NOCASE ASC";
 
@@ -234,7 +236,7 @@ public class DbAccess {
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT};
+        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_COLOR};
 
         String sortOrder = NoteEntry.COLUMN_NAME + " COLLATE NOCASE ASC";
 
@@ -466,5 +468,50 @@ public class DbAccess {
                 null,                           // Group
                 null,                           // Filter by Group
                 null);                     // Sort Order
+    }
+
+    public static void updateNoteColor(Context c, int id, int color) {
+        DbOpenHelper dbHelper = new DbOpenHelper(c);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(NoteEntry.COLUMN_COLOR, color);
+
+        String selection = NoteEntry.COLUMN_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(id)};
+
+        db.update(NoteEntry.TABLE_NAME, values, selection, selectionArgs);
+        db.close();
+    }
+
+
+    public static int getPosition(Context c, int i){
+        DbOpenHelper dbHelper = new DbOpenHelper(c);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] projection = {NoteEntry.COLUMN_POSITION};
+
+        Cursor cursor = db.query(NoteEntry.TABLE_NAME,   // Table name
+                projection,                     // SELECT
+                null,                           // Columns for WHERE
+                null,                           // Values for WHERE
+                null,                           // Group
+                null,                           // Filter by Group
+                null);                     // Sort Order
+        return cursor.getInt(cursor.getColumnIndexOrThrow(NoteEntry.COLUMN_POSITION));
+    }
+
+    public static void updateNotePosition(Context c, int id, int position) {
+        DbOpenHelper dbHelper = new DbOpenHelper(c);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(NoteEntry.COLUMN_POSITION, position);
+
+        String selection = NoteEntry.COLUMN_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(id)};
+
+        db.update(NoteEntry.TABLE_NAME, values, selection, selectionArgs);
+        db.close();
     }
 }

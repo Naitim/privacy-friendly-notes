@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 27
+    buildToolsVersion '27.0.1'
 
     defaultConfig {
         applicationId "org.secuso.privacyfriendlynotes"
         minSdkVersion 17
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 2
         versionName "1.0.1"
     }
@@ -22,9 +22,31 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
+    compile 'com.android.support:appcompat-v7:27.+'
+    compile 'com.android.support:design:27.+'
     compile 'com.getbase:floatingactionbutton:1.10.1'
     compile 'com.simplify:ink:0.2.2'
     compile 'petrov.kristiyan.colorpicker:colorpicker-library:1.1.0'
+
+    compile 'com.android.support:cardview-v7:27.+'
+    compile 'com.android.support:recyclerview-v7:27.+'
+
+    compile "com.android.support:support-core-utils:27.+"
+
+
+    compile 'eu.davidea:flexible-adapter:5.0.0-rc3'
+    compile 'eu.davidea:flexible-adapter-livedata:1.0.0-b1'
+    compile 'eu.davidea:flexible-adapter-databinding:1.0.0-b2'
+
+//    compile 'com.mikepenz:fastadapter:3.0.4@aar'
+//    compile 'com.mikepenz:fastadapter-commons:3.0.3@aar'
+//
+//    compile 'com.mikepenz:fastadapter-extensions:3.0.3@aar'
+
+
+
+//    dynamic coloring of colored cards
+    compile 'com.android.support:palette-v7:24.2.1'
+
+
 }

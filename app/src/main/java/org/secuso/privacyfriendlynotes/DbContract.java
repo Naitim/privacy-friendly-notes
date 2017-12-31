@@ -17,6 +17,8 @@ public class DbContract {
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_CATEGORY = "category";
         public static final String COLUMN_TRASH = "in_trash";
+        public static final String COLUMN_POSITION = "sort_position";
+        public static final String COLUMN_COLOR = "color";
         public static final int TYPE_TEXT = 1;
         public static final int TYPE_AUDIO = 2;
         public static final int TYPE_CHECKLIST = 3;

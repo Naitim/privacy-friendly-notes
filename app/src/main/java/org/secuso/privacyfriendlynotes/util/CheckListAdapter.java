@@ -38,7 +38,7 @@ public class CheckListAdapter extends ArrayAdapter <CheckListItem> {
 
         if (item != null) {
             CheckBox checkBox = (CheckBox) v.findViewById(R.id.item_checkbox);
-            TextView textView = (TextView) v.findViewById(R.id.item_name);
+            TextView textView = (TextView) v.findViewById(R.id.note_title);
 
             checkBox.setChecked(item.isChecked());
             textView.setText(item.getName());

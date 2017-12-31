@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -14,33 +12,34 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.*;
 import android.util.SparseBooleanArray;
-import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
+import org.secuso.privacyfriendlynotes.fragments.NotesListFragment;
 import org.secuso.privacyfriendlynotes.fragments.WelcomeDialog;
+import org.secuso.privacyfriendlynotes.util.NoteItem;
+
+import java.util.Comparator;
+
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
 
     private static final int CAT_ALL = -1;
     private static final String TAG_WELCOME_DIALOG = "welcome_dialog";
     FloatingActionsMenu fabMenu;
 
-    private int selectedCategory = CAT_ALL; //ID of the currently selected category. Defaults to "all"
+    private ActionMode mActionMode;
+
+    private NotesListFragment notesListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +54,8 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.fab_audio).setOnClickListener(this);
         findViewById(R.id.fab_sketch).setOnClickListener(this);
 
+        notesListFragment = (NotesListFragment) getFragmentManager().findFragmentById(R.id.list_notes);
+
         fabMenu = (FloatingActionsMenu) findViewById(R.id.fab_menu);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -65,152 +66,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //Fill the list from database
-        ListView notesList = (ListView) findViewById(R.id.notes_list);
-        notesList.setAdapter(new CursorAdapter(getApplicationContext(), DbAccess.getCursorAllNotes(getBaseContext()), CursorAdapter.FLAG_AUTO_REQUERY) {
-            @Override
-            public View newView(Context context, Cursor cursor, ViewGroup parent) {
-                LayoutInflater inflater = (LayoutInflater) context
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View rowView = inflater.inflate(R.layout.item_note, null);
-
-                TextView text = (TextView) rowView.findViewById(R.id.item_name);
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_NAME));
-                if (name.length() >= 30) {
-                    text.setText(name.substring(0,27) + "...");
-                } else {
-                    text.setText(name);
-                }
-
-                ImageView iv = (ImageView) rowView.findViewById(R.id.item_icon);
-                switch (cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_TYPE))) {
-                    case DbContract.NoteEntry.TYPE_SKETCH:
-                        iv.setImageResource(R.drawable.ic_photo_black_24dp);
-                        break;
-                    case DbContract.NoteEntry.TYPE_AUDIO:
-                        iv.setImageResource(R.drawable.ic_mic_black_24dp);
-                        break;
-                    case DbContract.NoteEntry.TYPE_TEXT:
-                        iv.setImageResource(R.drawable.ic_short_text_black_24dp);
-                        break;
-                    case DbContract.NoteEntry.TYPE_CHECKLIST:
-                        iv.setImageResource(R.drawable.ic_format_list_bulleted_black_24dp);
-                        break;
-                    default:
-                }
-                return rowView;
-            }
-
-            @Override
-            public void bindView(View view, Context context, Cursor cursor) {
-                TextView text = (TextView) view.findViewById(R.id.item_name);
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_NAME));
-                if (name.length() >= 30) {
-                    text.setText(name.substring(0,27) + "...");
-                } else {
-                    text.setText(name);
-                }
-
-                ImageView iv = (ImageView) view.findViewById(R.id.item_icon);
-                switch (cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_TYPE))) {
-                    case DbContract.NoteEntry.TYPE_SKETCH:
-                        iv.setImageResource(R.drawable.ic_photo_black_24dp);
-                        break;
-                    case DbContract.NoteEntry.TYPE_AUDIO:
-                        iv.setImageResource(R.drawable.ic_mic_black_24dp);
-                        break;
-                    case DbContract.NoteEntry.TYPE_TEXT:
-                        iv.setImageResource(R.drawable.ic_short_text_black_24dp);
-                        break;
-                    case DbContract.NoteEntry.TYPE_CHECKLIST:
-                        iv.setImageResource(R.drawable.ic_format_list_bulleted_black_24dp);
-                        break;
-                    default:
-                }
-            }
-        });
-        notesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        notesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //get details about the clicked note
-                CursorAdapter ca = (CursorAdapter) parent.getAdapter();
-                Cursor c = ca.getCursor();
-                c.moveToPosition(position);
-                //start the appropriate activity
-                switch (c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_TYPE))) {
-                    case DbContract.NoteEntry.TYPE_TEXT:
-                        Intent i = new Intent(getApplication(), TextNoteActivity.class);
-                        i.putExtra(TextNoteActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
-                        startActivity(i);
-                        break;
-                    case DbContract.NoteEntry.TYPE_AUDIO:
-                        Intent i2 = new Intent(getApplication(), AudioNoteActivity.class);
-                        i2.putExtra(AudioNoteActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
-                        startActivity(i2);
-                        break;
-                    case DbContract.NoteEntry.TYPE_SKETCH:
-                        Intent i3 = new Intent(getApplication(), SketchActivity.class);
-                        i3.putExtra(SketchActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
-                        startActivity(i3);
-                        break;
-                    case DbContract.NoteEntry.TYPE_CHECKLIST:
-                        Intent i4 = new Intent(getApplication(), ChecklistNoteActivity.class);
-                        i4.putExtra(ChecklistNoteActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
-                        startActivity(i4);
-                        break;
-                }
-            }
-        });
-        notesList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                //do nothing
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                // Inflate the menu for the CAB
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.main_cab, menu);
-                //Temporary fix, otherwise statusbar would be black
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                    getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-                    // or Color.TRANSPARENT or your preferred color
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                // Respond to clicks on the actions in the CAB
-                switch (item.getItemId()) {
-                    case R.id.action_delete:
-                        deleteSelectedItems();
-                        mode.finish(); // Action picked, so close the CAB
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                //Temporary fix, otherwise statusbar would be black
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                    getWindow().setStatusBarColor(Color.TRANSPARENT);
-                    // or Color.TRANSPARENT or your preferred color
-                }
-                updateList();
-            }
-        });
-
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_settings, false);
         SharedPreferences sp = getSharedPreferences(Preferences.SP_DATA, Context.MODE_PRIVATE);
@@ -223,10 +78,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
-        updateList();
         buildDrawerMenu();
     }
 
@@ -257,7 +112,12 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_sort_alphabetical) {
             //switch to an alphabetically sorted cursor.
-            updateListAlphabetical();
+            notesListFragment.sortItems(new Comparator<NoteItem>() {
+                @Override
+                public int compare(NoteItem a, NoteItem b) {
+                    return a.getTitle().compareToIgnoreCase(b.getTitle());
+                }
+            });
             return true;
         } else if (id == R.id.action_help) {
             startActivity(new Intent(getApplication(), HelpActivity.class));
@@ -280,13 +140,11 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_trash) {
             startActivity(new Intent(getApplication(), RecycleActivity.class));
         } else if (id == R.id.nav_all) {
-            selectedCategory = CAT_ALL;
-            updateList();
+            notesListFragment.setSelectedCategory(CAT_ALL);
         } else if (id == R.id.nav_manage_categories) {
             startActivity(new Intent(getApplication(), ManageCategoriesActivity.class));
         } else {
-            selectedCategory = id;
-            updateList();
+            notesListFragment.setSelectedCategory(id);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -334,33 +192,6 @@ public class MainActivity extends AppCompatActivity
         c.close();
     }
 
-    private void updateList() {
-        ListView notesList = (ListView) findViewById(R.id.notes_list);
-        CursorAdapter adapter = (CursorAdapter) notesList.getAdapter();
-        if (selectedCategory == -1) { //show all
-            String selection = DbContract.NoteEntry.COLUMN_TRASH + " = ?";
-            String[] selectionArgs = { "0" };
-            adapter.changeCursor(DbAccess.getCursorAllNotes(getBaseContext(), selection, selectionArgs));
-        } else {
-            String selection = DbContract.NoteEntry.COLUMN_CATEGORY + " = ? AND " + DbContract.NoteEntry.COLUMN_TRASH + " = ?";
-            String[] selectionArgs = { String.valueOf(selectedCategory), "0" };
-            adapter.changeCursor(DbAccess.getCursorAllNotes(getBaseContext(), selection, selectionArgs));
-        }
-    }
-
-    private void updateListAlphabetical() {
-        ListView notesList = (ListView) findViewById(R.id.notes_list);
-        CursorAdapter adapter = (CursorAdapter) notesList.getAdapter();
-        if (selectedCategory == -1) { //show all
-            String selection = DbContract.NoteEntry.COLUMN_TRASH + " = ?";
-            String[] selectionArgs = { "0" };
-            adapter.changeCursor(DbAccess.getCursorAllNotesAlphabetical(getBaseContext(), selection, selectionArgs));
-        } else {
-            String selection = DbContract.NoteEntry.COLUMN_CATEGORY + " = ? AND " + DbContract.NoteEntry.COLUMN_TRASH + " = ?";
-            String[] selectionArgs = { String.valueOf(selectedCategory), "0" };
-            adapter.changeCursor(DbAccess.getCursorAllNotesAlphabetical(getBaseContext(), selection, selectionArgs));
-        }
-    }
 
     private void deleteSelectedItems(){
         ListView notesList = (ListView) findViewById(R.id.notes_list);
@@ -372,4 +203,5 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
 }

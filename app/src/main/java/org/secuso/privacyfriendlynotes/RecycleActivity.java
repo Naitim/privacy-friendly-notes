@@ -38,7 +38,7 @@ public class RecycleActivity extends AppCompatActivity {
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View rowView = inflater.inflate(R.layout.item_note, null);
 
-                TextView text = (TextView) rowView.findViewById(R.id.item_name);
+                TextView text = (TextView) rowView.findViewById(R.id.note_title);
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_NAME));
                 if (name.length() >= 30) {
                     text.setText(name.substring(0,27) + "...");
@@ -67,7 +67,7 @@ public class RecycleActivity extends AppCompatActivity {
 
             @Override
             public void bindView(View view, Context context, Cursor cursor) {
-                TextView text = (TextView) view.findViewById(R.id.item_name);
+                TextView text = (TextView) view.findViewById(R.id.note_title);
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_NAME));
                 if (name.length() >= 30) {
                     text.setText(name.substring(0,27) + "...");

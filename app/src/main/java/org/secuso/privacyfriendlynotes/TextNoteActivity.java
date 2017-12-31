@@ -39,6 +39,7 @@ import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import petrov.kristiyan.colorpicker.ColorPicker;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +55,7 @@ public class TextNoteActivity extends AppCompatActivity implements View.OnClickL
     EditText etName;
     EditText etContent;
     Spinner spinner;
+    Button btnColorSelector;
 
     private ShareActionProvider mShareActionProvider = null;
 
@@ -79,6 +81,9 @@ public class TextNoteActivity extends AppCompatActivity implements View.OnClickL
         etName = (EditText) findViewById(R.id.etName);
         etContent = (EditText) findViewById(R.id.etContent);
         spinner = (Spinner) findViewById(R.id.spinner_category);
+
+        btnColorSelector = (Button) findViewById(R.id.btn_color_selector);
+        btnColorSelector.setOnClickListener(this);
 
         loadActivity(true);
 
@@ -271,19 +276,40 @@ public class TextNoteActivity extends AppCompatActivity implements View.OnClickL
                 shouldSave = true; //safe on exit
                 finish();
                 break;
+            case R.id.btn_color_selector:
+                displayColorDialog();
+                break;
             default:
         }
+    }
+
+    private int color = -1;
+    private void displayColorDialog() {
+        new ColorPicker(this)
+                .setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
+                    @Override
+                    public void setOnFastChooseColorListener(int position, int col) {
+                        color = col;
+                        btnColorSelector.setBackgroundColor(color);
+                    }
+                })
+                .setColors(R.array.mdcolor_500)
+                .setTitle("")
+                .show();
+
     }
 
     private void updateNote(){
         fillNameIfEmpty();
         DbAccess.updateNote(getBaseContext(), id, etName.getText().toString(), etContent.getText().toString(), currentCat);
+        DbAccess.updateNoteColor(getBaseContext(), id, color);
         Toast.makeText(getApplicationContext(), R.string.toast_updated, Toast.LENGTH_SHORT).show();
     }
 
     private void saveNote(){
         fillNameIfEmpty();
         id = DbAccess.addNote(getBaseContext(), etName.getText().toString(), etContent.getText().toString(), DbContract.NoteEntry.TYPE_TEXT, currentCat);
+        DbAccess.updateNoteColor(getBaseContext(), id, color);
         Toast.makeText(getApplicationContext(), R.string.toast_saved, Toast.LENGTH_SHORT).show();
     }
 
