@@ -86,4 +86,9 @@
     <string name="settings_use_custom_font_size_title">Eigene Schriftgröße</string>
     <string name="settings_use_custom_font_size_sum">Nutze eine eigene Schriftgröße im Text Notiz Editor.</string>
     <string name="title_sketchnote">Skizze</string>
+    <string name="trash">In den Papierkorb verschieben:</string>
+    <string name="delete">Permanent gelöscht</string>
+    <string name="undo">Rückgängig</string>
+    <string name="category">Kategorie</string>
+    <string name="selecting">Wähle aus</string>
 </resources>

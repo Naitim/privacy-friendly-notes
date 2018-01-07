@@ -192,7 +192,6 @@ public class MainActivity extends AppCompatActivity
         c.close();
     }
 
-
     private void deleteSelectedItems(){
         ListView notesList = (ListView) findViewById(R.id.notes_list);
         CursorAdapter adapter = (CursorAdapter) notesList.getAdapter();

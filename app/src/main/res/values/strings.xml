@@ -105,4 +105,11 @@
     <string name="about_url" translatable="false"><a href="https://www.secuso.org/pfa">SECUSO-Website</a></string>
     <string name="about_github" translatable="false"><a href="https://github.com/SecUSo/privacy-friendly-notes">Github-Repo</a></string>
 
+
+    <string name="trash">Trashed</string>
+    <string name="delete">Permanently deleted</string>
+    <string name="undo">Undo</string>
+    <string name="category">Category</string>
+    <string name="selecting">Selecting</string>
+
 </resources>

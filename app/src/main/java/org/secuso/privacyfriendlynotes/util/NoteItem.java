@@ -1,6 +1,7 @@
 package org.secuso.privacyfriendlynotes.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -13,7 +14,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.viewholders.FlexibleViewHolder;
+import org.secuso.privacyfriendlynotes.DbAccess;
 import org.secuso.privacyfriendlynotes.DbContract;
 import org.secuso.privacyfriendlynotes.R;
 
@@ -24,21 +27,26 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
     private int id;
     private String title;
     private String content;
+    private String bottom_text;
     private Drawable icon;
     private Drawable trashIcon;
-    //
     private Cursor cursor;
-    //Maybe use Android O Color
+    // TODO: Maybe use Android O Color
     private int color;
 
 
-    public NoteItem(Cursor c, Activity activity){
+    public NoteItem(Cursor c, Activity activity) {
 
         this.id = c.getInt((c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
         this.title = c.getString(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_NAME));
         this.color = c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_COLOR));
         this.trashIcon = activity.getResources().getDrawable(R.drawable.ic_delete_black_24dp);
         this.cursor = c;
+
+        int cat = c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_CATEGORY));
+        Cursor catCursor = DbAccess.getCategory(activity.getBaseContext(), cat);
+        catCursor.moveToFirst();
+        this.bottom_text = activity.getString(R.string.category) + ": " + catCursor.getString(catCursor.getColumnIndexOrThrow(DbContract.CategoryEntry.COLUMN_NAME));
 
         switch (c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_TYPE))) {
             case DbContract.NoteEntry.TYPE_SKETCH:
@@ -49,7 +57,7 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
                 break;
             case DbContract.NoteEntry.TYPE_TEXT:
                 this.icon = activity.getResources().getDrawable(R.drawable.ic_short_text_black_24dp, activity.getTheme());
-                this.content = truncateNoteText(c.getString(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_CONTENT)));
+                this.content = c.getString(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_CONTENT));
                 break;
             case DbContract.NoteEntry.TYPE_CHECKLIST:
                 this.icon = activity.getResources().getDrawable(R.drawable.ic_format_list_bulleted_black_24dp, activity.getTheme());
@@ -60,24 +68,6 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
         setSelectable(true);
         //Allow dragging
         setDraggable(true);
-    }
-
-    // TODO: use maxlines in the textview instead
-    private String truncateNoteText(String text) {
-        //TODO: implement this properly
-        //TODO: Maybe also truncate the note title
-        int tmp = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == "\n".charAt(0)) {
-                tmp++;
-                if (tmp > 1) {
-                    return text.substring(0, i);
-                }
-            }
-        }
-        if(text.length() > 50)
-            return text.substring(0, 50);
-        return text;
     }
 
     @Override
@@ -101,7 +91,7 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
     @Override
     public void bindViewHolder(FlexibleAdapter adapter, ViewHolder holder, int position, List payloads) {
 
-        if(content == null || content.equals(""))
+        if (content == null || content.equals(""))
             holder.mText.setHeight(0);
 
         if (title != null) {
@@ -110,6 +100,7 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
         }
         if (content != null && !content.equals("")) {
             holder.mText.setText(content);
+            holder.mText.setMaxLines(3);
             holder.mText.setEnabled(isEnabled());
         }
         if (icon != null) {
@@ -117,31 +108,37 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
         }
         holder.mTrash.setImageDrawable(trashIcon);
 
+        holder.bottom_bar.setText(bottom_text);
+
 //        System.out.println("color of " + title + ": " + color);
 
-        holder.mCard.setCardBackgroundColor(color);
+//        holder.mCard.setCardBackgroundColor(color);
 
-        //TODO: doesn't work, just don't make black available and create a new color palette for readable note colors
-            //compensation for dark colors
-//
-//            int red = (color >>> 16) & 0x000000FF;
-//            int green = (color >>> 8) & 0x000000FF;
-//            int blue = (color) & 0x000000FF;
-//
-//            System.out.println("red: " + red);
-//
-//            System.out.println("color average: " + (red + green + blue) / 3);
-//            //simple check to see how dark the color is
-//            if((red + green + blue) / 3 < 60){
-////                holder.top_bar.setBackgroundTintList(ColorStateList.valueOf(R.color.white_ultra_transparent));
-////                holder.top_bar.setBackgroundColor(0x12FFFFFF);
-//                holder.top_bar.setBackgroundResource(R.color.white_ultra_transparent);
-////                holder.bottom_bar.setBackgroundColor(R.color.white_ultra_transparent);
-//            }
-//        }
+        // DrawableUtils for Animations
+        int pressedColor = highlightColor(color, 0.8f);
+
+
+        Context context = holder.itemView.getContext();
+        Drawable drawable = DrawableUtils.getSelectableBackgroundCompat(
+                color, pressedColor, // Same color of divider
+                DrawableUtils.getColorControlHighlight(context));
+        DrawableUtils.setBackgroundCompat(holder.itemView, drawable);
     }
 
-    public static class ViewHolder extends FlexibleViewHolder{
+    // helper for getting highlight-color
+    private static int highlightColor(int color, float factor) {
+        int a = Color.alpha( color );
+        int r = Color.red( color );
+        int g = Color.green( color );
+        int b = Color.blue( color );
+
+        return Color.argb( a,
+                Math.max( (int)(r * factor), 0 ),
+                Math.max( (int)(g * factor), 0 ),
+                Math.max( (int)(b * factor), 0 ) );
+    }
+
+    public static class ViewHolder extends FlexibleViewHolder {
 
         public TextView mTitle;
         public TextView mText;
@@ -150,12 +147,6 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
         public CardView mCard;
         public RelativeLayout top_bar;
         public TextView bottom_bar;
-
-        @Override
-        public void toggleActivation() {
-            super.toggleActivation();
-            System.out.println("toggleActivation");
-        }
 
         public ViewHolder(View view, FlexibleAdapter adapter) {
             super(view, adapter);
@@ -172,21 +163,6 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
 //            setDragHandleView(top_bar);
             setDragHandleView(mIcon);
         }
-
-        //        @Override
-//        public void scrollAnimators(@NonNull List<Animator> animators, int position, boolean isForward) {
-//            if (mAdapter.getRecyclerView().getLayoutManager() instanceof GridLayoutManager) {
-//                if (position % 2 != 0)
-//                    AnimatorHelper.slideInFromRightAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
-//                else
-//                    AnimatorHelper.slideInFromLeftAnimator(animators, itemView, mAdapter.getRecyclerView(), 0.5f);
-//            } else {
-//                if (isForward)
-//                    AnimatorHelper.slideInFromBottomAnimator(animators, itemView, mAdapter.getRecyclerView());
-//                else
-//                    AnimatorHelper.slideInFromTopAnimator(animators, itemView, mAdapter.getRecyclerView());
-//            }
-//        }
     }
 
     public String getTitle() {

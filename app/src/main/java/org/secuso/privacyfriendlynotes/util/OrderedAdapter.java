@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+/// Simple Wrapper around FlexibleAdapter to easily control sorting of items
 public class OrderedAdapter<T extends IFlexible> extends FlexibleAdapter<T>{
 
     public OrderedAdapter(@Nullable List<T> items) {

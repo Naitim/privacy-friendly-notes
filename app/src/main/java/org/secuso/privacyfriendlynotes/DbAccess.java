@@ -170,7 +170,7 @@ public class DbAccess {
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_COLOR};
+        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_CATEGORY, NoteEntry.COLUMN_COLOR};
 
         return db.query(NoteEntry.TABLE_NAME,   // Table name
                 projection,                     // SELECT
@@ -192,7 +192,7 @@ public class DbAccess {
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_COLOR};
+        String[] projection = {NoteEntry.COLUMN_ID, NoteEntry.COLUMN_TYPE, NoteEntry.COLUMN_NAME, NoteEntry.COLUMN_CONTENT, NoteEntry.COLUMN_CATEGORY, NoteEntry.COLUMN_COLOR};
 
         return db.query(NoteEntry.TABLE_NAME,   // Table name
                 projection,                     // SELECT
@@ -264,6 +264,28 @@ public class DbAccess {
                 projection,                     // SELECT
                 null,                           // Columns for WHERE
                 null,                           // Values for WHERE
+                null,                           // Group
+                null,                           // Filter by
+                null);                     // Sort Order
+    }
+
+    /**
+     * Returns a cursor over one category
+     * @param c the current context
+     * @return A {@link android.database.Cursor} for the category
+     */
+    public static Cursor getCategory(Context c, int category){
+        DbOpenHelper dbHelper = new DbOpenHelper(c);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] projection = {CategoryEntry.COLUMN_ID, CategoryEntry.COLUMN_NAME};
+        String selection = CategoryEntry.COLUMN_ID + " = ?";
+        String[] selectionArgs = {"" + category};
+
+        return db.query(CategoryEntry.TABLE_NAME,   // Table name
+                projection,                     // SELECT
+                selection,                           // Columns for WHERE
+                selectionArgs,                           // Values for WHERE
                 null,                           // Group
                 null,                           // Filter by
                 null);                     // Sort Order

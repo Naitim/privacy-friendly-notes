@@ -103,7 +103,6 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
             @Override
             public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
                 super.onItemRangeMoved(fromPosition, toPosition, itemCount);
-                System.out.println(actionModeHelper.getActionMode());
                 updateOrdering();
             }
         };
@@ -135,7 +134,7 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
             c = DbAccess.getCursorAllNotes(getActivity().getBaseContext(), selection, selectionArgs);
         } else {
             String selection = DbContract.NoteEntry.COLUMN_CATEGORY + " = ? AND " + DbContract.NoteEntry.COLUMN_TRASH + " = ?";
-            String[] selectionArgs = { String.valueOf(category), "0" };
+            String[] selectionArgs = {String.valueOf(category), "0" };
             c = DbAccess.getCursorAllNotes(getActivity().getBaseContext(), selection, selectionArgs);
         }
 
@@ -233,45 +232,42 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.main_cab, menu);
-        getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.black_semi_transparent, getActivity().getTheme()));
+//        inflater.inflate(R.menu.main_cab, menu);
+        //TODO: proper color
+        getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary, getActivity().getTheme()));
         return true;
     }
 
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        System.out.println("SOMETHING???");
         return false;
     }
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        System.out.println("actionmode something");
         switch (item.getItemId()) {
             case R.id.action_delete:
                 // Build message before delete, for the SnackBar
                 StringBuilder message = new StringBuilder();
-                message.append("getString(R.string.action_deleted)").append(" ");
+                message.append(getString(R.string.trash)).append(" ");
                 for (Integer pos : noteAdapter.getSelectedPositions()) {
-                    message.append("extractTitleFrom(mAdapter.getItem(pos))");
-                    if (noteAdapter.getSelectedItemCount() > 1)
+                    message.append(noteAdapter.getItem(pos).getTitle());
+//                    if (noteAdapter.getSelectedItemCount() > 1)
                         message.append(", ");
                 }
+                message.delete(message.length()-2, message.length());
 
                 // Experimenting NEW feature
                 noteAdapter.setRestoreSelectionOnUndo(true);
                 noteAdapter.setPermanentDelete(false);
 
+                // TODO: Fix behaviour of UndoHelper when changing categories, opening the paper bin or closing the app
                 // New Undo Helper (Basic usage)
                 new UndoHelper((FlexibleAdapter) noteAdapter, this)
                         .withPayload(Payload.CHANGE)
                         .start(noteAdapter.getSelectedPositions(),
-                                getView().findViewById(R.id.main_content), message,
-                                "getString(R.string.undo)", UndoHelper.UNDO_TIMEOUT);
-
-                // Enable Refreshing
-//                mRefreshHandler.sendEmptyMessage(REFRESH_START);
-//                mRefreshHandler.sendEmptyMessageDelayed(REFRESH_STOP, UndoHelper.UNDO_TIMEOUT);
+                                getView().findViewById(R.id.rv), message,
+                                getString(R.string.undo), UndoHelper.UNDO_TIMEOUT);
 
                 // Finish the action mode
                 actionModeHelper.destroyActionModeIfCan();
@@ -287,22 +283,20 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.white, getActivity().getTheme()));
+        //TODO: proper color
+//        getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.white, getActivity().getTheme()));
     }
 
     @Override
     public boolean onItemClick(int position) {
-        System.out.println("SOMETHING???!");
         // Action on elements are allowed if Mode is IDLE, otherwise selection has priority
         if (noteAdapter.getMode() != Mode.IDLE && actionModeHelper != null) {
             boolean activate = actionModeHelper.onClick(position);
             // Last activated position is now available
 //            Log.d(TAG, "Last activated position " + actionModeHelper.getActivatedPosition());
-            System.out.println("Last activated position " + actionModeHelper.getActivatedPosition());
             return activate;
         } else {
             // Handle the item click listener
-            System.out.println("Handle item click listener");
             clickItem(position);
             return false;
         }
@@ -310,9 +304,13 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
 
     private void clickItem(int position){
         NoteItem item = noteAdapter.getItem(position);
-        Cursor c = item.getCursor();
+
+        Cursor c = DbAccess.getNote(getActivity().getBaseContext(), item.getId());
+        c.moveToFirst();
+
+        int type = c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_TYPE));
         //start the appropriate activity
-        switch (c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_TYPE))) {
+        switch (type) {
             case DbContract.NoteEntry.TYPE_TEXT:
                 Intent i = new Intent(getActivity().getApplication(), TextNoteActivity.class);
                 i.putExtra(TextNoteActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
@@ -338,30 +336,25 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
 
     @Override
     public void onItemLongClick(int position) {
-        System.out.println("SOMETHING???");
         actionModeHelper.onLongClick((AppCompatActivity) getActivity(), position);
     }
 
     @Override
     public void onSupportActionModeStarted(ActionMode mode) {
-        System.out.println("actionmode something");
     }
 
     @Override
     public void onSupportActionModeFinished(ActionMode mode) {
-        System.out.println("actionmode something");
     }
 
     @Nullable
     @Override
     public ActionMode onWindowStartingSupportActionMode(ActionMode.Callback callback) {
-        System.out.println("actionmode something");
         return null;
     }
 
 
     private void initializeActionModeHelper(@SelectableAdapter.Mode int mode) {
-        System.out.println("initializeActionModeHelper \n\n");
         //this = ActionMode.Callback instance
         actionModeHelper = new ActionModeHelper(noteAdapter, R.menu.main_cab, this) {
             // Override to customize the title
@@ -369,9 +362,10 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
             public void updateContextTitle(int count) {
                 // You can use the internal mActionMode instance
                 if (mActionMode != null) {
-                    mActionMode.setTitle(count == 1 ?
-                            "Selected one" :
-                            "Selected many");
+                    mActionMode.setTitle(getString(R.string.selecting));
+//                    mActionMode.setTitle(count == 1 ?
+//                            getString(R.string.action_selected_one) :
+//                            getString(R.string.action_selected_many));
                 }
             }
         }.withDefaultMode(mode);
@@ -381,14 +375,20 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
     // undohelper
     @Override
     public void onActionCanceled(int action) {
-        System.out.println("Delete Canceled");
+        // Restore deleted items
+        noteAdapter.restoreDeletedItems();
+        // Check also selection restoration
+        if (noteAdapter.isRestoreWithSelection()) {
+            actionModeHelper.restoreSelection((AppCompatActivity) this.getActivity());
+        }
     }
 
     @Override
     public void onActionConfirmed(int action, int event) {
-        System.out.println("Delete Confirmed");
+        for (NoteItem note : noteAdapter.getDeletedItems()){
+            DbAccess.trashNote(getActivity().getBaseContext(), note.getId());
+        }
     }
-
 
 //    /**
 //     * Update the list and restore the last known ordering

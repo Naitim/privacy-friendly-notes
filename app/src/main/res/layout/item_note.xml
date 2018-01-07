@@ -5,11 +5,9 @@
                                     android:id="@+id/note_card"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:background="?android:attr/selectableItemBackground"
                                     android:layout_margin="2dp"
                                     card_view:cardElevation="2dp"
-                                    card_view:cardCornerRadius="1dp"
-                                    card_view:cardBackgroundColor="@color/white">
+                                    card_view:cardCornerRadius="1dp">
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -85,7 +83,6 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentBottom="true"
                     android:textSize="8dp"
-                    android:text="Kategorie:                   Änderungsdatum:   "
             />
         </RelativeLayout>
     </LinearLayout>
