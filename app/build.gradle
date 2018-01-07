@@ -42,11 +42,4 @@ dependencies {
 //    compile 'com.mikepenz:fastadapter-commons:3.0.3@aar'
 //
 //    compile 'com.mikepenz:fastadapter-extensions:3.0.3@aar'
-
-
-
-//    dynamic coloring of colored cards
-    compile 'com.android.support:palette-v7:24.2.1'
-
-
 }

@@ -91,4 +91,5 @@
     <string name="undo">Rückgängig</string>
     <string name="category">Kategorie</string>
     <string name="selecting">Wähle aus</string>
+    <string name="search_hint">Durchsuche Notizen</string>
 </resources>

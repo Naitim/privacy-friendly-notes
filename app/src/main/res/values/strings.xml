@@ -111,5 +111,6 @@
     <string name="undo">Undo</string>
     <string name="category">Category</string>
     <string name="selecting">Selecting</string>
+    <string name="search_hint">Search notes</string>
 
 </resources>

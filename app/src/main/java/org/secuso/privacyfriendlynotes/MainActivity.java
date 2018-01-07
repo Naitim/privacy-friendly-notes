@@ -1,5 +1,6 @@
 package org.secuso.privacyfriendlynotes;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,17 +9,20 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.*;
+import android.text.InputType;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ListView;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -31,11 +35,13 @@ import java.util.Comparator;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, android.support.v7.widget.SearchView.OnQueryTextListener {
 
     private static final int CAT_ALL = -1;
     private static final String TAG_WELCOME_DIALOG = "welcome_dialog";
     FloatingActionsMenu fabMenu;
+
+    private SearchView mSearchView;
 
     private ActionMode mActionMode;
 
@@ -96,9 +102,43 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        if (searchItem != null) {
+            searchItem.setOnActionExpandListener(
+                    new MenuItem.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(MenuItem item) {
+                            notesListFragment.startSearch();
+                            fabMenu.setVisibility(View.INVISIBLE);
+//                            MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
+//                            if (listTypeItem != null)
+//                                listTypeItem.setVisible(false);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(MenuItem item) {
+                            fabMenu.setVisibility(View.VISIBLE);
+                            notesListFragment.stopSearch();
+//                            MenuItem listTypeItem = menu.findItem(R.id.action_list_type);
+//                            if (listTypeItem != null)
+//                                listTypeItem.setVisible(true);
+                            return true;
+                        }
+                    });
+            mSearchView = (SearchView) searchItem.getActionView();
+            mSearchView.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
+            mSearchView.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_FULLSCREEN);
+            mSearchView.setQueryHint(getString(R.string.search_hint));
+            mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            mSearchView.setOnQueryTextListener(this);
+        }
+
         return true;
     }
 
@@ -125,6 +165,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(getApplication(), SettingsActivity.class));
         } else if (id == R.id.action_about) {
             startActivity(new Intent(getApplication(), AboutActivity.class));
+        } else if (id == R.id.action_search){
         }
 
         return super.onOptionsItemSelected(item);
@@ -203,4 +244,24 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        notesListFragment.filter(s);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        notesListFragment.filter(s);
+        return false;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            notesListFragment.filter(query);
+        }
+
+    }
 }

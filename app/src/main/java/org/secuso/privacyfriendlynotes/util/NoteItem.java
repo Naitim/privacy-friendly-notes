@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 import eu.davidea.flexibleadapter.items.AbstractFlexibleItem;
+import eu.davidea.flexibleadapter.items.IFilterable;
 import eu.davidea.flexibleadapter.utils.DrawableUtils;
 import eu.davidea.viewholders.FlexibleViewHolder;
 import org.secuso.privacyfriendlynotes.DbAccess;
@@ -22,7 +22,7 @@ import org.secuso.privacyfriendlynotes.R;
 
 import java.util.List;
 
-public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
+public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> implements IFilterable {
 
     private int id;
     private String title;
@@ -136,6 +136,17 @@ public class NoteItem extends AbstractFlexibleItem<NoteItem.ViewHolder> {
                 Math.max( (int)(r * factor), 0 ),
                 Math.max( (int)(g * factor), 0 ),
                 Math.max( (int)(b * factor), 0 ) );
+    }
+
+    @Override
+    public boolean filter(String constraint) {
+        if (content != null && content.toLowerCase().contains(constraint))
+            return  true;
+
+        if(title != null && title.toLowerCase().contains(constraint))
+            return true;
+
+        return false;
     }
 
     public static class ViewHolder extends FlexibleViewHolder {

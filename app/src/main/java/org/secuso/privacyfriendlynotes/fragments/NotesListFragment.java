@@ -39,6 +39,9 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
     private ActionModeHelper actionModeHelper;
     private RecyclerView rv;
 
+    // indicator if a search is active
+    private boolean searching = false;
+
     private RecyclerView.AdapterDataObserver observer;
 
     private static final int CAT_ALL = -1;
@@ -70,9 +73,6 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
     @Override
@@ -181,11 +181,26 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
         changeCategory(category);
     }
 
+    public void startSearch(){
+        searching = true;
+        noteAdapter.setHandleDragEnabled(false);
+    }
+
+    public void stopSearch(){
+        searching = false;
+        noteAdapter.setHandleDragEnabled(true);
+    }
+
     public void changeCategory(int category){
         //TODO In this function, fetch the list of items of the selected category and update the adapter
         // Make it animated by not updating the dataset but instead comparing the lists and using addItem, removeItem, and reArrangeItems
         // this function becomes unnecessary if updateList implements animation in the same way
         updateList();
+    }
+
+    public void filter(String searchText){
+        noteAdapter.setSearchText(searchText);
+        noteAdapter.filterItems();
     }
 
 
@@ -209,7 +224,9 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
     @Override
     public void onResume() {
         super.onResume();
-        updateList();
+        if(!searching){
+            updateList();
+        }
     }
 
     @Override
