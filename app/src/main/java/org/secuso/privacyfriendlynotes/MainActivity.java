@@ -71,7 +71,9 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView bottomNavigationView = (NavigationView) findViewById(R.id.nav_view_bottom);
         navigationView.setNavigationItemSelectedListener(this);
+        bottomNavigationView.setNavigationItemSelectedListener(this);
 
         PreferenceManager.setDefaultValues(this, R.xml.pref_settings, false);
         SharedPreferences sp = getSharedPreferences(Preferences.SP_DATA, Context.MODE_PRIVATE);
@@ -159,12 +161,6 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             return true;
-        } else if (id == R.id.action_help) {
-            startActivity(new Intent(getApplication(), HelpActivity.class));
-        } else if (id == R.id.action_settings) {
-            startActivity(new Intent(getApplication(), SettingsActivity.class));
-        } else if (id == R.id.action_about) {
-            startActivity(new Intent(getApplication(), AboutActivity.class));
         } else if (id == R.id.action_search){
         }
 
@@ -184,6 +180,12 @@ public class MainActivity extends AppCompatActivity
             notesListFragment.setSelectedCategory(CAT_ALL);
         } else if (id == R.id.nav_manage_categories) {
             startActivity(new Intent(getApplication(), ManageCategoriesActivity.class));
+        } else if (id == R.id.action_help) {
+            startActivity(new Intent(getApplication(), HelpActivity.class));
+        } else if (id == R.id.action_settings) {
+            startActivity(new Intent(getApplication(), SettingsActivity.class));
+        } else if (id == R.id.action_about) {
+            startActivity(new Intent(getApplication(), AboutActivity.class));
         } else {
             notesListFragment.setSelectedCategory(id);
         }
