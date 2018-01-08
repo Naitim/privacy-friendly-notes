@@ -184,7 +184,7 @@ public class TextNoteActivity extends AppCompatActivity implements View.OnClickL
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if (edit){
-            getMenuInflater().inflate(R.menu.text, menu);
+            getMenuInflater().inflate(R.menu.audio, menu);
             MenuItem item = menu.findItem(R.id.action_share);
             mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
             setShareIntent();

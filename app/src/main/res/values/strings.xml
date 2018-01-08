@@ -46,23 +46,30 @@
     <string name="toast_category_exists">Category already exists</string>
     <string name="toast_alarm_scheduled">Alarm scheduled for %1s</string>
     <string name="toast_need_permission_audio">Permission to use the microphone is needed for this feature</string>
-    <string name="toast_need_permission_write_external">Permission to write to external storage is needed for this feature</string>
+    <string name="toast_need_permission_write_external">Permission to write to external storage is needed for this
+        feature
+    </string>
     <string name="toast_external_storage_not_mounted">Error: Cannot write to external storage</string>
     <string name="toast_file_exported_to">Exported note to %1s</string>
 
     <string name="dialog_delete_title">Delete %1s?</string>
     <string name="dialog_delete_message">Are you sure you want to delete %1s?</string>
     <string name="dialog_trash_title">Moving to recycle bin</string>
-    <string name="dialog_trash_message">Notes will be moved to the recycle bin. You can recover or permanently delete them there. Notifications cannot be restored.</string>
+    <string name="dialog_trash_message">Notes will be moved to the recycle bin. You can recover or permanently delete
+        them there. Notifications cannot be restored.
+    </string>
     <string name="dialog_save_title">Deleting selected items.</string>
     <string name="dialog_save_message">Checked items will be deleted on updating or saving the note.</string>
     <string name="dialog_restore_title">Restore or delete %1s?</string>
     <string name="dialog_restore_message">Do you want to restore or delete %1s?</string>
     <string name="dialog_need_category_title">No Categories</string>
-    <string name="dialog_need_category_message">You need to create at least one category.\nDo you want to do that now?</string>
+    <string name="dialog_need_category_message">You need to create at least one category.\nDo you want to do that now?
+    </string>
     <string name="dialog_welcome">Welcome</string>
     <string name="dialog_help">View Help</string>
-    <string name="dialog_welcome_text">With this app you can create and share notes in the form of text, checklists, memos and sketches.</string>
+    <string name="dialog_welcome_text">With this app you can create and share notes in the form of text, checklists,
+        memos and sketches.
+    </string>
     <string name="dialog_ok" translatable="false">OKAY</string>
 
     <string name="dialog_option_delete">Delete</string>
@@ -86,24 +93,36 @@
     <string name="settings_font_size_sum">Click here to select the font size.</string>
 
     <string name="help_overview_heading">Overview</string>
-    <string name="help_intro">Welcome to the help page. This app lets you take and manage notes without compromising your privacy.</string>
+    <string name="help_intro">Welcome to the help page. This app lets you take and manage notes without compromising
+        your privacy.
+    </string>
     <string name="help_privacy_heading">Privacy Info</string>
     <string name="help_perm_receive_boot_title">RECEIVE BOOT COMPLETED</string>
     <string name="help_perm_receive_boot_sum">is needed to reschedule the notifications after a reboot.</string>
     <string name="help_perm_record_audio_title">RECORD AUDIO</string>
-    <string name="help_perm_record_audio_sum">is needed to record audio notes; if this is not granted, audio notes are unavailable.</string>
+    <string name="help_perm_record_audio_sum">is needed to record audio notes; if this is not granted, audio notes are
+        unavailable.
+    </string>
     <string name="help_perm_write_external_title">WRITE EXTERNAL STORAGE</string>
-    <string name="help_perm_write_external_sum">is needed to save notes to the internal memory; if this is not granted, notes cannot be saved externally.</string>
+    <string name="help_perm_write_external_sum">is needed to save notes to the internal memory; if this is not granted,
+        notes cannot be saved externally.
+    </string>
 
     <string name="about_version_number">Version 1.0.1</string>
-    <string name="about_author">Authors: </string>
+    <string name="about_author">Authors:</string>
     <string name="about_author_names" translatable="false">Robin Morawetz</string>
     <string name="about_author_contributors">and contributors.</string>
     <string name="about_affiliation">In affiliation with</string>
-    <string name="about_privacy_friendly">This application belongs to the group of Privacy Friendly Apps developed by Technische Universität Darmstadt. Sourcecode licensed under GPLv3. Images copyright TU Darmstadt and Google Inc.</string>
+    <string name="about_privacy_friendly">This application belongs to the group of Privacy Friendly Apps developed by
+        Technische Universität Darmstadt. Sourcecode licensed under GPLv3. Images copyright TU Darmstadt and Google Inc.
+    </string>
     <string name="about_more_info">More information can be found on:</string>
-    <string name="about_url" translatable="false"><a href="https://www.secuso.org/pfa">SECUSO-Website</a></string>
-    <string name="about_github" translatable="false"><a href="https://github.com/SecUSo/privacy-friendly-notes">Github-Repo</a></string>
+    <string name="about_url" translatable="false">
+        <a href="https://www.secuso.org/pfa">SECUSO-Website</a>
+    </string>
+    <string name="about_github" translatable="false">
+        <a href="https://github.com/SecUSo/privacy-friendly-notes">Github-Repo</a>
+    </string>
 
 
     <string name="trash">Trashed</string>
@@ -112,5 +131,6 @@
     <string name="category">Category</string>
     <string name="selecting">Selecting</string>
     <string name="search_hint">Search notes</string>
+    <string name="title_activity_view_text_note">ViewTextNoteActivity</string>
 
 </resources>

@@ -329,8 +329,11 @@ public class NotesListFragment extends Fragment implements AppCompatCallback, Un
         //start the appropriate activity
         switch (type) {
             case DbContract.NoteEntry.TYPE_TEXT:
-                Intent i = new Intent(getActivity().getApplication(), TextNoteActivity.class);
-                i.putExtra(TextNoteActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
+//                Intent i = new Intent(getActivity().getApplication(), TextNoteActivity.class);
+//                i.putExtra(TextNoteActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
+//                startActivity(i);
+                Intent i = new Intent(getActivity().getApplication(), ViewTextNoteActivity.class);
+                i.putExtra(ViewTextNoteActivity.EXTRA_ID, c.getInt(c.getColumnIndexOrThrow(DbContract.NoteEntry.COLUMN_ID)));
                 startActivity(i);
                 break;
             case DbContract.NoteEntry.TYPE_AUDIO:

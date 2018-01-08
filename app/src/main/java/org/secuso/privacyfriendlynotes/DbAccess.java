@@ -507,33 +507,13 @@ public class DbAccess {
     }
 
 
-    public static int getPosition(Context c, int i){
+    public static String getName(Context c, int i){
         DbOpenHelper dbHelper = new DbOpenHelper(c);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {NoteEntry.COLUMN_POSITION};
+        Cursor cursor = getNote(c, i);
 
-        Cursor cursor = db.query(NoteEntry.TABLE_NAME,   // Table name
-                projection,                     // SELECT
-                null,                           // Columns for WHERE
-                null,                           // Values for WHERE
-                null,                           // Group
-                null,                           // Filter by Group
-                null);                     // Sort Order
-        return cursor.getInt(cursor.getColumnIndexOrThrow(NoteEntry.COLUMN_POSITION));
-    }
-
-    public static void updateNotePosition(Context c, int id, int position) {
-        DbOpenHelper dbHelper = new DbOpenHelper(c);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(NoteEntry.COLUMN_POSITION, position);
-
-        String selection = NoteEntry.COLUMN_ID + " = ?";
-        String[] selectionArgs = {String.valueOf(id)};
-
-        db.update(NoteEntry.TABLE_NAME, values, selection, selectionArgs);
-        db.close();
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndexOrThrow(NoteEntry.COLUMN_NAME));
     }
 }
